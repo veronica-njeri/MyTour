@@ -1,4 +1,4 @@
-package com.example.mytour.Fragments;
+package com.example.mytour.fragments;
 
 import android.os.Bundle;
 

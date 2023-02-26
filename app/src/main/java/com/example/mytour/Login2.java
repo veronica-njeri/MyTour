@@ -12,7 +12,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.mytour.Fragments.HomeFragment;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class Login2 extends AppCompatActivity {

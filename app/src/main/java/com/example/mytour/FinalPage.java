@@ -1,21 +1,16 @@
 package com.example.mytour;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
-import android.widget.TextView;
 
-import com.example.mytour.Fragments.FeedFragment;
-import com.example.mytour.Fragments.HomeFragment;
-import com.example.mytour.Fragments.SearchFragment;
+import com.example.mytour.fragments.FeedFragment;
+import com.example.mytour.fragments.HomeFragment;
+import com.example.mytour.fragments.SearchFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 

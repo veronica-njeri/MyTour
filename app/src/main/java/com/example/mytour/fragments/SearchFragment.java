@@ -1,24 +1,36 @@
-package com.example.mytour.Fragments;
+package com.example.mytour.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.widget.SearchView;
-import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.mytour.Imagemodel;
 import com.example.mytour.R;
 import com.example.mytour.viewAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -28,7 +40,6 @@ import com.google.firebase.database.Query;
 public class SearchFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    viewAdapter adapter;
     DatabaseReference mbase;
     private Query mQuery;
     // TODO: Rename parameter arguments, choose names that match
@@ -39,6 +50,8 @@ public class SearchFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private List<Imagemodel> imageModels = new ArrayList<>();
+    SearchViewAdapter adapter;
 
     public SearchFragment() {
         // Required empty public constructor
@@ -77,9 +90,20 @@ public class SearchFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         mbase = FirebaseDatabase.getInstance().getReference();
+        setViews(view);
+        setRecycler();
         setSearch(view);
         fetchData();
         return view;
+    }
+
+    private void setRecycler() {
+        adapter = new SearchViewAdapter(new ArrayList<>());
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void setViews(View view) {
+        recyclerView = view.findViewById(R.id.container);
     }
 
     private void setSearch(View view) {
@@ -88,39 +112,50 @@ public class SearchFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mQuery = mbase.orderByChild("name").equalTo(query);
-                FirebaseRecyclerOptions<Imagemodel> options = new FirebaseRecyclerOptions.Builder<Imagemodel>()
-                        .setQuery(mQuery, Imagemodel.class)
-                        .build();
-                adapter = new viewAdapter(options);
-                recyclerView.setAdapter(adapter);
+                adapter.getFilter().filter(query);
                 return false;
 
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-
+                adapter.getFilter().filter(newText);
                 return true;
             }
         });
     }
 
+
     private void fetchData() {
 
+        mbase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Imagemodel imagemodel = dataSnapshot.getValue(Imagemodel.class);
+                    imageModels.add(imagemodel);
+                }
+                adapter.replaceData(imageModels);
+            }
 
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // calling on cancelled method when we receive
+                // any error or we are not able to get the data.
+
+            }
+        });
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        adapter.startListening();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        adapter.stopListening();
     }
 
 }
